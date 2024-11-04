@@ -305,6 +305,8 @@ RUN cd /home/$USERNAME/ros2_ws/ \
   && colcon build --merge-install
 
 RUN echo "source /home/$USERNAME/ros2_ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
+RUN echo "eval '$(register-python-argcomplete3 ros2)'" >> /home/$USERNAME/.zshrc
+RUN echo "eval '$(register-python-argcomplete3 colcon)'" >> /home/$USERNAME/.zshrc
 
 USER root
 

@@ -13,7 +13,9 @@ Follow the official Docker installation guide.
 #### 2. **Build the Container**:
 Run the build script to build Docker image and install all dependencies. This should take around 10-20 minutes. 
 
+
 ```bash
+   cd docker
    ./build_container.sh
 ```
 
@@ -21,6 +23,7 @@ Run the build script to build Docker image and install all dependencies. This sh
 Initiate the container with
 
 ```bash
+   cd docker
    ./start_container.sh
 ```
 
@@ -28,6 +31,7 @@ Initiate the container with
 Save the current state of the Docker container using
 
 ```bash
+   cd docker
    ./stop_container.sh
 ```
 
@@ -35,6 +39,7 @@ Save the current state of the Docker container using
 For terminal access, run
 
 ```bash
+   cd docker
    ./attach_container.sh
 ```
 

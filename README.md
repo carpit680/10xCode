@@ -1,5 +1,10 @@
 # _Containered ROS2 Development Environment_
 
+Credits to [tatsuyai713](https://github.com/tatsuyai713/Development-Container-for-ROS2-on-Arm64-Mac) It gave me a good starting point.
+
+
+These steps will guide you through setting up and using a ROS 2 Docker container on your x86-64 or arm64-based Ubuntu or Mac device, including desktop access through RDP or passthrough if using vscode dev-containers.
+
 ## Method1: Dev Container in vscode with GUI passthrough (Tested on x86-64 Ubuntu 22.04)
 This sets up ROS2 Dev Container with Rviz2, Ignition Gazebo, Moveit2, Nav2, SLAM Toolbox and other dependencies.
 
@@ -43,7 +48,7 @@ Run the build script to build the Docker image and install all dependencies. Thi
    ./build_container.sh
 ```
 
-1. **Start the Container**:
+#### 3. **Start the Container**:
 Initiate the container with
 
 ```bash
@@ -51,7 +56,7 @@ Initiate the container with
    ./start_container.sh
 ```
 
-4. **Commit Changes**:
+#### 4. **Commit Changes**:
 Save the current state of the Docker container using
 
 ```bash
@@ -59,7 +64,7 @@ Save the current state of the Docker container using
    ./stop_container.sh
 ```
 
-5. **Access the Container**:
+#### 5. **Access the Container**:
 For terminal access, run
 
 ```bash
@@ -67,14 +72,13 @@ For terminal access, run
    ./attach_container.sh
 ```
 
-   to use bash inside the Docker container.
-
-6. **Desktop Environment**: 
+#### 6. **Desktop Environment**: 
    To use the KDE Plasma Desktop via xrdp, connect using an RDP client to `127.0.0.1` or `localhost`.
 
 ### Recommended RDP Clients
 
-- **Windows App**:
-  It supports sound playback. Use the host system's username and password.
+- **Windows App / Microsoft Remote Desktop**:
+   Available on Mac and Windows. Use the host system's username and password.
 
-These steps will guide you through setting up and using a ROS 2 Docker container on your x86-64 or arm64-based Ubuntu or Mac device, including desktop access through RDP.
+- **Remmina**:
+   Available on Ubuntu. Use the host system's username and password.

@@ -56,7 +56,6 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recomm
         apt-transport-https \
         apt-utils \
         build-essential \
-        ca-certificates \
         cups-filters \
         cups-common \
         cups-pdf \
@@ -276,7 +275,7 @@ RUN echo "source /opt/ros/humble/setup.zsh" >> /home/$USERNAME/.zshrc && \
 
 RUN echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /home/$USERNAME/.zshrc
 
-RUN sudo apt install ros-humble-moveit -y
+RUN sudo apt update && sudo apt install ros-humble-moveit -y
 
 # RUN sudo apt install -y \
 #   build-essential \
@@ -323,8 +322,34 @@ RUN sudo apt install -y ros-humble-navigation2 \
 
 RUN sudo apt install ros-humble-slam-toolbox -y
 
-RUN sudo apt install ros-humble-ros-gz ros-humble-gz-ros2-control  -y 
+RUN sudo apt update && sudo apt install ros-humble-ros-gz -y 
 
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get update && apt-get install -q -y --no-install-recommends \
+    dirmngr \
+    build-essential \
+    cmake \
+  && apt-get clean
+
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
+  apt-get update && apt-get install -q -y --no-install-recommends \
+    python3-colcon-ros \
+    python3-colcon-common-extensions \
+    python3-rosdep \
+    && apt-get clean
+
+RUN mkdir -p /home/$USERNAME/ros2_ws/src \
+    && cd /home/$USERNAME/ros2_ws/src \
+    && git clone https://github.com/ros-controls/gz_ros2_control/ -b humble \
+    && rosdep install --from-paths ./ -i -y --rosdistro humble
+
+RUN cd /home/$USERNAME/ros2_ws/ \
+  && . /opt/ros/humble/setup.sh \
+  && colcon build --merge-install
+
+  RUN echo "source /home/$USERNAME/ros2_ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
 # RUN sudo apt update && sudo apt install -y gazebo
 
 # RUN apt-get update && apt-get install -q -y --no-install-recommends \

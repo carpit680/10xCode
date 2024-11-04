@@ -1,20 +1,52 @@
-# Development Container for ROS 2 on M1/2 Mac
- This docker file makes the container of ROS 2 Humble for M1 Mac (ARM64)
+# Development Container for ROS 2 on Apple Silicon
+This Dockerfile is designed to create a Docker container specifically for ROS 2 Humble, optimized for M1/M2 Macs (ARM64 architecture).
 
-## How to use
-1. Install docker for M1 Mac
-2. Build container : execute "./build_container.sh \<JP or US\>" (for Japanese : "./build_container.sh JP")
-3. Start Container : execute "./start_container.sh"
-4. Commit docker container : "./stop_container.sh"
-5. Attach docker container and use bash : "./attach_container.sh"
-6. Use KDE Plasma Desktop via xrdp : use RDP Client and access to 127.0.0.1 or localhost.
+## Getting Started
 
-## Recommended RDP Client
+### Prerequisites
+- Docker installed on your M1/M2 Mac
 
-- Microsoft Remote Desktop
+### Setup Instructions
 
-Support sound but cannot input "_" by JP keyboard
+1. **Install Docker for M1/M2 Mac**: 
+   Follow the official Docker installation guide for ARM64-based Macs.
+2. **Build the Container**: 
+   Run the build script with the keyboard type as an argument. For instance, for Japanese, use
 
-- Parallels Client
+```
+   ./build_container.sh
+```
 
-Support "_" by JP keyboard but sound is not suported
+   
+1. **Start the Container**: 
+   Initiate the container with
+
+```
+   ./start_container.sh
+```
+   
+4. **Commit Changes**: 
+   Save the current state of the Docker container using
+
+```
+   ./stop_container.sh
+```
+   
+5. **Access the Container**: 
+   For terminal access, run
+
+```
+   ./attach_container.sh
+```
+
+   to use bash inside the Docker container.
+   
+6. **Desktop Environment**: 
+   To use the KDE Plasma Desktop via xrdp, connect using an RDP client to `127.0.0.1` or `localhost`.
+
+### Recommended RDP Clients
+
+- **Windows App**:
+  It supports sound playback. Use your Mac username as your user name and leave the password blank when asked for it.
+
+These steps will guide you through setting up and using a ROS 2 Docker container on your M1/M2 Mac, including desktop access through RDP. Choose the Microsoft Remote Desktop for comprehensive functionality, including sound playback and full keyboard support.

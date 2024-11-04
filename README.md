@@ -20,7 +20,7 @@ This sets up ROS2 Dev Container with Rviz2, Ignition Gazebo, Moveit2, Nav2, SLAM
 
 5. Any GUI application can then directly be run using the terminal.
  
-## Method2: Development Container for ROS 2 via RDP (Tested on x86-64 Ubuntu 22.04 and arm64 M2 Mac)
+## Method2: Docker Container for ROS2 with GUI via RDP (Tested on x86-64 Ubuntu 22.04 and arm64 M2 Mac)
 This Dockerfile is designed to create a Docker container for ROS 2 Humble and includes the following main packages preinstalled.
 
 - ROS2 Humble

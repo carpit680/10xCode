@@ -1,0 +1,12 @@
+{
+    "build": { "dockerfile": "docker/dockerfiles/dev_container.dockerfile" },
+  
+    "customizations": {
+      "vscode": {
+        "extensions": ["dbaeumer.vscode-eslint"]
+      }
+    },
+  
+    "forwardPorts": [3000]
+  }
+  

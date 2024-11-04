@@ -1,3 +1,7 @@
+painting_ws/build/
+painting_ws/log/
+painting_ws/install/
+
 .DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -7,7 +7,7 @@ ARG NEW_HOSTNAME=${HOSTNAME}-Docker
 ARG USERNAME=$UNAME
 ARG HOME=/home/$USERNAME
 ARG LOCALE="US"
-
+ARG USER=$UNAME
 
 RUN useradd -u $UID -m $USERNAME && \
         echo "$USERNAME:$USERNAME" | chpasswd && \
@@ -92,8 +92,6 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recomm
         fonts-opensymbol \
         fonts-symbola \
         fonts-ubuntu \
-        libpulse0 \
-        pulseaudio \
         supervisor \
         net-tools \
         libglvnd-dev \
@@ -259,18 +257,18 @@ RUN apt update && apt install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Pulseaudio
-RUN apt update && apt install -y libtool libpulse-dev git autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
+# RUN apt update && apt install -y libtool libpulse-dev git autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
 
-RUN git clone --recursive https://github.com/pulseaudio/pulseaudio.git && \
-    cd pulseaudio && \
-    git checkout tags/v15.99.1 -b v15.99.1 && \
-    meson build && \
-    ninja -C build && \
-    cd ../ && \
-    git clone --recursive https://github.com/neutrinolabs/pulseaudio-module-xrdp.git && \
-    cd pulseaudio-module-xrdp/ && \
-    ./bootstrap && ./configure PULSE_DIR=$(pwd)/../pulseaudio && \
-    make && make install
+# RUN git clone --recursive https://github.com/pulseaudio/pulseaudio.git && \
+#     cd pulseaudio && \
+#     git checkout tags/v15.99.1 -b v15.99.1 && \
+#     meson build && \
+#     ninja -C build && \
+#     cd ../ && \
+#     git clone --recursive https://github.com/neutrinolabs/pulseaudio-module-xrdp.git && \
+#     cd pulseaudio-module-xrdp/ && \
+#     ./bootstrap && ./configure PULSE_DIR=$(pwd)/../pulseaudio && \
+#     make && make install
 
 USER $USERNAME
 
@@ -299,12 +297,8 @@ RUN sudo apt install ros-humble-slam-toolbox -y
 
 RUN sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-RUN sudo apt update
-RUN sudo apt install -y gz-harmonic
-
-RUN sudo apt install ros-humble-ros-gz-image -y
-RUN sudo apt install ros-humble-ros-gz-sim -y
-RUN sudo apt install ros-humble-ros-ign-bridge -y
+RUN sudo apt-get update
+RUN sudo apt-get install -y gz-harmonic
 
 USER root
 
@@ -330,17 +324,17 @@ RUN { \
       echo "[program:xrdp]"; \
       echo "command=/usr/sbin/xrdp --nodaemon"; \
       echo "user=xrdp"; \
-      echo "[program:pulseaudio]"; \
+    #   echo "[program:pulseaudio]"; \
       echo "priority=15"; \
       echo "directory=/home/$USERNAME"; \
-      echo "command=/usr/bin/pulseaudio"; \
+    #   echo "command=/usr/bin/pulseaudio"; \
       echo "user=$USERNAME"; \
       echo "autostart=true"; \
       echo "autorestart=true"; \
       echo "stopsignal=TERM"; \
       echo "environment=DISPLAY=:1,HOME=/home/$USERNAME"; \
-      echo "stdout_logfile=/var/log/pulseaudio.log"; \
-      echo "stderr_logfile=/var/log/pulseaudio.err"; \
+    #   echo "stdout_logfile=/var/log/pulseaudio.log"; \
+    #   echo "stderr_logfile=/var/log/pulseaudio.err"; \
     } > /etc/supervisor/xrdp.conf
 
 RUN { \

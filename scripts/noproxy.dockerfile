@@ -202,9 +202,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recomm
         kubuntu-restricted-extras \
         kubuntu-wallpapers \
         pavucontrol-qt \
-        transmission-qt \
-
-
+        transmission-qt && \
     rm -rf /var/lib/apt/lists/*
 
 RUN apt update \
@@ -280,22 +278,29 @@ USER $USERNAME
 RUN sudo rosdep init && \
     rosdep update
 
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
-    echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
-RUN echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+RUN echo "source /opt/ros/humble/setup.zsh" >> ~/.zshrc && \
+    echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.zsh" >> ~/.zshrc
+
+RUN echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> ~/.zshrc
 
 # Install ROS tools
 RUN sudo apt install ros-humble-moveit -y
 
 RUN sudo apt install ros-humble-rmw-cyclonedds-cpp -y
 
-RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ~/.bashrc
+RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ~/.zshrc
 
 RUN sudo apt install -y ros-humble-navigation2 \
     ros-humble-nav2-bringup
 
 RUN sudo apt install ros-humble-slam-toolbox -y
+
+RUN sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+RUN sudo apt-get update
+RUN sudo apt-get install -y gz-harmonic
 
 USER root
 

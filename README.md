@@ -1,5 +1,12 @@
-# __Development Container for ROS 2 via RDP (Tested on x86 Ubuntu and arm64 M2 Mac)__
-This Dockerfile is designed to create a Docker container specifically for ROS 2 Humble.
+# __Development Container for ROS 2 via RDP (Tested on amd64 Ubuntu and arm64 M2 Mac)__
+This Dockerfile is designed to create a Docker container for ROS 2 Humble and includes the following main packages preinstalled.
+
+- ROS2 Humble
+- KDE Plasma
+- Gazebo Ignition
+- Moveit2
+- SLAM Toolbox
+- Nav2
 
 ### Prerequisites
 - Docker installed on your system
@@ -11,7 +18,7 @@ This Dockerfile is designed to create a Docker container specifically for ROS 2 
 Follow the official Docker installation guide.
 
 #### 2. **Build the Container**:
-Run the build script to build Docker image and install all dependencies. This should take around 10-20 minutes. 
+Run the build script to build the Docker image and install all dependencies. This should take around 10-20 minutes. 
 
 
 ```bash
@@ -51,6 +58,6 @@ For terminal access, run
 ### Recommended RDP Clients
 
 - **Windows App**:
-  It supports sound playback. Use host system's username as your user name and password.
+  It supports sound playback. Use the host system's username and password.
 
-These steps will guide you through setting up and using a ROS 2 Docker container on your x86, arm64 based Ubuntu, Mac or Windows device, including desktop access through RDP. Choose the Microsoft Remote Desktop for comprehensive functionality.
+These steps will guide you through setting up and using a ROS 2 Docker container on your amd64 or arm64-based Ubuntu or Mac device, including desktop access through RDP.

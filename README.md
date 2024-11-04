@@ -8,39 +8,38 @@ This Dockerfile is designed to create a Docker container specifically for ROS 2 
 
 ### Setup Instructions
 
-1. **Install Docker for M1/M2 Mac**: 
-   Follow the official Docker installation guide for ARM64-based Macs.
-2. **Build the Container**: 
-   Run the build script with the keyboard type as an argument. For instance, for Japanese, use
+#### 1. **Install Docker for M1/M2 Mac**:
+Follow the official Docker installation guide for ARM64-based Macs.
+#### 2. **Build the Container**:
+Run the build script to build Docker image and install all dependencies. This should take around 10-20 minutes. 
 
-```
+```bash
    ./build_container.sh
 ```
 
-   
-1. **Start the Container**: 
-   Initiate the container with
+1. **Start the Container**:
+Initiate the container with
 
-```
+```bash
    ./start_container.sh
 ```
-   
-4. **Commit Changes**: 
-   Save the current state of the Docker container using
 
-```
+4. **Commit Changes**:
+Save the current state of the Docker container using
+
+```bash
    ./stop_container.sh
 ```
-   
-5. **Access the Container**: 
-   For terminal access, run
 
-```
+5. **Access the Container**:
+For terminal access, run
+
+```bash
    ./attach_container.sh
 ```
 
    to use bash inside the Docker container.
-   
+
 6. **Desktop Environment**: 
    To use the KDE Plasma Desktop via xrdp, connect using an RDP client to `127.0.0.1` or `localhost`.
 

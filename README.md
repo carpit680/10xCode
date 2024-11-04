@@ -1,21 +1,4 @@
-# _Containered ROS2 Development Environment_
-
-## Method1: Dev Container in vscode with GUI passthrough (Tested on x86 Ubuntu)
-This sets up ROS2 Dev Container with Rviz2, Ignition Gazebo, Moveit2, Nav2, SLAM Toolbox and other dependencies.
-
-### Setup Instructions
-
-1. Install Dev Container VSCode extension and Remote Development Extension pack
-
-2. Clone the repository.
-
-3. VSCode should ask you to reopen the directory in dev container. Or you can invoke `Dev Containers: Reopen in Container` from command panel in VSCode.
-
-4. You will need to source ROS2 using `source /opt/ros/humble/setup.bash` for now.
-
-5. Any GUI application can then directly be run using the terminal.
-
-## Method2: Development Container for ROS 2 via RDP (Tested on x86 Ubuntu and arm64 M2 Mac)
+# __Development Container for ROS 2 via RDP (Tested on x86 Ubuntu and arm64 M2 Mac)__
 This Dockerfile is designed to create a Docker container specifically for ROS 2 Humble.
 
 ### Prerequisites

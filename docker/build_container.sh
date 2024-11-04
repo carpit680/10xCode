@@ -20,5 +20,3 @@ fi
 
 # Build the Docker image
 ./launch_container.sh build
-
-echo "Built Container Image: ${NAME_IMAGE}"

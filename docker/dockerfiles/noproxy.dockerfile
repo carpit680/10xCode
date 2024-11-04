@@ -242,14 +242,17 @@ RUN apt -y update \
  && apt install -y firefox
 
 # install ROS2 Humble
-RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
-RUN apt update && apt install -y --no-install-recommends \
-        ros-humble-desktop \
-        ros-dev-tools \
-        && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN sudo apt update && sudo apt install locales
+RUN sudo locale-gen en_US en_US.UTF-8
+RUN sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+RUN export LANG=en_US.UTF-8
+RUN sudo apt install software-properties-common
+RUN sudo add-apt-repository universe
+RUN sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+RUN sudo apt update && sudo apt upgrade -y 
+RUN sudo apt install ros-humble-desktop -y
+RUN sudo apt install ros-dev-tools -y 
 
 # Install ROS tools
 RUN apt update && apt install -y --no-install-recommends \
@@ -258,11 +261,6 @@ RUN apt update && apt install -y --no-install-recommends \
         && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Pulseaudio
-# RUN apt update && apt install -y libtool git autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
-
-# USER $USERNAME
 
 # initialize rosdep
 RUN sudo rosdep init && \
@@ -277,45 +275,9 @@ RUN echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /home/$USER
 
 RUN sudo apt update && sudo apt install ros-humble-moveit -y
 
-# RUN sudo apt install -y \
-#   build-essential \
-#   cmake \
-#   git \
-#   python3-colcon-common-extensions \
-#   python3-flake8 \
-#   python3-setuptools \
-#   python3-vcstool \
-#   wget
-
-# RUN . /opt/ros/humble/setup.sh
-
-# RUN mkdir -p /home/$USERNAME/ws_moveit2/src
-# RUN cd /home/$USERNAME/ws_moveit2/src
-
-# USER root
-# WORKDIR /home/$USERNAME/ws_moveit2/src
-# RUN  cd /home/$USERNAME/ws_moveit2/src
-# RUN git clone https://github.com/moveit/moveit2.git -b main 
-# RUN for repo in moveit2/moveit2.repos $(f="moveit2/moveit2_humble.repos"; test -r $f && echo $f); do vcs import < "$repo"; done
-
-# RUN cd /home/$USERNAME/ws_moveit2
-# RUN rosdep install -r --from-paths /home/$USERNAME/ws_moveit2/src --ignore-src --rosdistro humble -y
-
 RUN sudo apt install ros-humble-rmw-cyclonedds-cpp -y
 
 RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/$USERNAME/.zshrc
-
-# RUN cd /home/$USERNAME/ws_moveit2/
-
-# Resolve duplicate gtest/gmock installations
-# RUN rm -rf /usr/src/gtest /usr/src/gmock
-# RUN sudo pip install setuptools numpy
-# RUN sudo pip install setuptools==61.0.0 numpy==1.22.4
-# RUN sudo apt-get update && sudo apt-get install -y gfortran
-# RUN sudo apt-get install -y libglu1-mesa-dev freeglut3-dev mesa-common-dev
-# WORKDIR /home/$USERNAME/ws_moveit2
-# RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
-# RUN echo "source /home/$USERNAME/ws_moveit2/install/setup.zsh" >> /home/$USERNAME/.zshrc
 
 RUN sudo apt install -y ros-humble-navigation2 \
     ros-humble-nav2-bringup
@@ -328,17 +290,8 @@ RUN apt-get update \
   && apt-get upgrade -y \
   && apt-get update && apt-get install -q -y --no-install-recommends \
     dirmngr \
-    build-essential \
     cmake \
   && apt-get clean
-
-RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
-  apt-get update && apt-get install -q -y --no-install-recommends \
-    python3-colcon-ros \
-    python3-colcon-common-extensions \
-    python3-rosdep \
-    && apt-get clean
 
 RUN mkdir -p /home/$USERNAME/ros2_ws/src \
     && cd /home/$USERNAME/ros2_ws/src \
@@ -349,53 +302,7 @@ RUN cd /home/$USERNAME/ros2_ws/ \
   && . /opt/ros/humble/setup.sh \
   && colcon build --merge-install
 
-  RUN echo "source /home/$USERNAME/ros2_ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
-# RUN sudo apt update && sudo apt install -y gazebo
-
-# RUN apt-get update && apt-get install -q -y --no-install-recommends \
-# dirmngr \
-# gnupg2 \
-# lsb-release \
-# python3-colcon-ros \
-# && apt-get clean
-
-# RUN mkdir -p /home/$USERNAME/ros2_ws/src \
-#     && cd /home/$USERNAME/ros2_ws/src/ \
-#     && git clone -b humble https://github.com/ros-controls/gazebo_ros2_control
-
-# USER $USERNAME
-
-# RUN cd /home/$USERNAME/ros2_ws/src/ \
-#     &&rosdep fix-permissions && rosdep update \
-#     && rosdep install --from-paths ./ -i -y --rosdistro humble \
-#     --ignore-src
-
-# USER root
-# RUN cd /home/$USERNAME/ros2_ws/ \
-#     && . /opt/ros/humble/setup.sh \
-#     && colcon build --merge-install
-
-# RUN echo "source /home/$USERNAME/ros2_ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
-
-# RUN mkdir -p /home/$USERNAME/ws/src
-
-# # RUN wget https://raw.githubusercontent.com/ros-simulation/gazebo_ros_pkgs/ros2/gazebo_ros_pkgs.repos
-# # RUN wget https://raw.githubusercontent.com/ros-simulation/gazebo_ros_pkgs/humble/gazebo_ros_pkgs.repos
-# RUN cd /home/$USERNAME/ws/src \
-#     && git clone https://github.com/ros-simulation/gazebo_ros_pkgs.git -b ros2
-
-# # RUN vcs import src < gazebo_ros_pkgs.repos
-
-# # RUN vcs custom --args checkout humble
-
-# RUN 
-
-# RUN cd /home/$USERNAME/ws \
-#     && . /opt/ros/humble/setup.sh \
-#     && rosdep install --from-paths src --ignore-src -r -y \
-#     && colcon build --symlink-install
-
-# RUN echo "source /home/$USERNAME/ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
+RUN echo "source /home/$USERNAME/ros2_ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
 
 USER root
 

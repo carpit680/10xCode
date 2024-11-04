@@ -222,10 +222,10 @@ RUN apt update \
 
 USER root
 
-ENV XDG_CURRENT_DESKTOP KDE
-ENV KWIN_COMPOSE N
+ENV XDG_CURRENT_DESKTOP=KDE
+ENV KWIN_COMPOSE=N
 # Use sudoedit to change protected files instead of using sudo on kate
-ENV SUDO_EDITOR kate
+ENV SUDO_EDITOR=kate
 
 RUN add-apt-repository ppa:mozillateam/ppa
 
@@ -262,17 +262,6 @@ RUN apt update && apt install -y --no-install-recommends \
 
 # Pulseaudio
 RUN apt update && apt install -y libtool git autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
-
-# RUN git clone --recursive https://github.com/pulseaudio/pulseaudio.git && \
-#     cd pulseaudio && \
-#     git checkout tags/v15.99.1 -b v15.99.1 && \
-#     meson build && \
-#     ninja -C build && \
-#     cd ../ && \
-#     git clone --recursive https://github.com/neutrinolabs/pulseaudio-module-xrdp.git && \
-#     cd pulseaudio-module-xrdp/ && \
-#     ./bootstrap && ./configure PULSE_DIR=$(pwd)/../pulseaudio && \
-#     make && make install
 
 USER $USERNAME
 
@@ -430,7 +419,7 @@ RUN { \
       echo '#Dir::Cache::pkgcache ""; Dir::Cache::srcpkgcache "";'; \
     } > /etc/apt/apt.conf.d/docker-clean
 
-USER ${USER}
+USER $USERNAME
 RUN LANG=C xdg-user-dirs-update --force
 RUN touch /home/${USERNAME}/Desktop/home.desktop
 RUN touch /home/${USERNAME}/Desktop/trash.desktop

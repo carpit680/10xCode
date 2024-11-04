@@ -328,7 +328,7 @@ RUN sudo apt-get update && sudo apt-get install -y gfortran
 RUN sudo apt-get install -y libglu1-mesa-dev freeglut3-dev mesa-common-dev
 WORKDIR /home/$USERNAME/ws_moveit2
 RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
-RUN echo "source /home/$USERNAME/ws_moveit2/install/setup.bash" >> /home/$USERNAME/.zshrc
+RUN echo "source /home/$USERNAME/ws_moveit2/install/setup.zsh" >> /home/$USERNAME/.zshrc
 
 RUN sudo apt install -y ros-humble-navigation2 \
     ros-humble-nav2-bringup

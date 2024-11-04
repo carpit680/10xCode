@@ -141,6 +141,8 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recomm
         zsh && \
     rm -rf /var/lib/apt/lists/*
 
+RUN usermod --shell /usr/bin/zsh $USERNAME
+
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
         kde-plasma-desktop \
         kwin-addons \
@@ -259,18 +261,18 @@ RUN apt update && apt install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Pulseaudio
-RUN apt update && apt install -y libtool libpulse-dev git autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
+RUN apt update && apt install -y libtool git autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
 
-RUN git clone --recursive https://github.com/pulseaudio/pulseaudio.git && \
-    cd pulseaudio && \
-    git checkout tags/v15.99.1 -b v15.99.1 && \
-    meson build && \
-    ninja -C build && \
-    cd ../ && \
-    git clone --recursive https://github.com/neutrinolabs/pulseaudio-module-xrdp.git && \
-    cd pulseaudio-module-xrdp/ && \
-    ./bootstrap && ./configure PULSE_DIR=$(pwd)/../pulseaudio && \
-    make && make install
+# RUN git clone --recursive https://github.com/pulseaudio/pulseaudio.git && \
+#     cd pulseaudio && \
+#     git checkout tags/v15.99.1 -b v15.99.1 && \
+#     meson build && \
+#     ninja -C build && \
+#     cd ../ && \
+#     git clone --recursive https://github.com/neutrinolabs/pulseaudio-module-xrdp.git && \
+#     cd pulseaudio-module-xrdp/ && \
+#     ./bootstrap && ./configure PULSE_DIR=$(pwd)/../pulseaudio && \
+#     make && make install
 
 USER $USERNAME
 
@@ -280,17 +282,53 @@ RUN sudo rosdep init && \
 
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
-RUN echo "source /opt/ros/humble/setup.zsh" >> ~/.zshrc && \
-    echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.zsh" >> ~/.zshrc
+RUN echo "source /opt/ros/humble/setup.zsh" >> /home/$USERNAME/.zshrc && \
+    echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.zsh" >> /home/$USERNAME/.zshrc
 
-RUN echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> ~/.zshrc
+RUN echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /home/$USERNAME/.zshrc
 
 # Install ROS tools
-RUN sudo apt install ros-humble-moveit -y
+# RUN sudo apt install ros-humble-moveit -y
+
+RUN sudo apt install -y \
+  build-essential \
+  cmake \
+  git \
+  python3-colcon-common-extensions \
+  python3-flake8 \
+  python3-setuptools \
+  python3-vcstool \
+  wget
+
+RUN . /opt/ros/humble/setup.sh
+
+RUN mkdir -p /home/$USERNAME/ws_moveit2/src
+RUN cd /home/$USERNAME/ws_moveit2/src
+
+USER root
+WORKDIR /home/$USERNAME/ws_moveit2/src
+# RUN  cd /home/$USERNAME/ws_moveit2/src
+RUN git clone https://github.com/moveit/moveit2.git -b main 
+RUN for repo in moveit2/moveit2.repos $(f="moveit2/moveit2_humble.repos"; test -r $f && echo $f); do vcs import < "$repo"; done
+
+RUN cd /home/$USERNAME/ws_moveit2
+RUN rosdep install -r --from-paths /home/$USERNAME/ws_moveit2/src --ignore-src --rosdistro humble -y
 
 RUN sudo apt install ros-humble-rmw-cyclonedds-cpp -y
 
-RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ~/.zshrc
+RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/$USERNAME/.zshrc
+
+# RUN cd /home/$USERNAME/ws_moveit2/
+
+# Resolve duplicate gtest/gmock installations
+RUN rm -rf /usr/src/gtest /usr/src/gmock
+RUN sudo pip install setuptools numpy
+RUN sudo pip install setuptools==61.0.0 numpy==1.22.4
+RUN sudo apt-get update && sudo apt-get install -y gfortran
+RUN sudo apt-get install -y libglu1-mesa-dev freeglut3-dev mesa-common-dev
+WORKDIR /home/$USERNAME/ws_moveit2
+RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+RUN echo "source /home/$USERNAME/ws_moveit2/install/setup.bash" >> /home/$USERNAME/.zshrc
 
 RUN sudo apt install -y ros-humble-navigation2 \
     ros-humble-nav2-bringup
@@ -299,8 +337,55 @@ RUN sudo apt install ros-humble-slam-toolbox -y
 
 RUN sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-RUN sudo apt-get update
-RUN sudo apt-get install -y gz-harmonic
+# RUN sudo apt-get update
+# RUN sudo apt-get install -y gz-harmonic
+
+RUN sudo apt update && sudo apt install -y gazebo
+
+RUN apt-get update && apt-get install -q -y --no-install-recommends \
+dirmngr \
+gnupg2 \
+lsb-release \
+python3-colcon-ros \
+&& apt-get clean
+
+RUN mkdir -p /home/$USERNAME/ros2_ws/src \
+    && cd /home/$USERNAME/ros2_ws/src/ \
+    && git clone -b humble https://github.com/ros-controls/gazebo_ros2_control
+
+USER $USERNAME
+
+RUN cd /home/$USERNAME/ros2_ws/src/ \
+    &&rosdep fix-permissions && rosdep update \
+    && rosdep install --from-paths ./ -i -y --rosdistro humble \
+    --ignore-src
+
+USER root
+RUN cd /home/$USERNAME/ros2_ws/ \
+    && . /opt/ros/humble/setup.sh \
+    && colcon build --merge-install
+
+RUN echo "source /home/$USERNAME/ros2_ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
+
+RUN mkdir -p /home/$USERNAME/ws/src
+
+# RUN wget https://raw.githubusercontent.com/ros-simulation/gazebo_ros_pkgs/ros2/gazebo_ros_pkgs.repos
+# RUN wget https://raw.githubusercontent.com/ros-simulation/gazebo_ros_pkgs/humble/gazebo_ros_pkgs.repos
+RUN cd /home/$USERNAME/ws/src \
+    && git clone https://github.com/ros-simulation/gazebo_ros_pkgs.git -b ros2
+
+# RUN vcs import src < gazebo_ros_pkgs.repos
+
+# RUN vcs custom --args checkout humble
+
+RUN 
+
+RUN cd /home/$USERNAME/ws \
+    && . /opt/ros/humble/setup.sh \
+    && rosdep install --from-paths src --ignore-src -r -y \
+    && colcon build --symlink-install
+
+RUN echo "source /home/$USERNAME/ws/install/setup.zsh" >> /home/$USERNAME/.zshrc
 
 USER root
 

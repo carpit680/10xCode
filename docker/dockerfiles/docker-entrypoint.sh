@@ -32,3 +32,6 @@ if [ -x "$(command -v startplasma-x11)" ]; then export KDE_START="startplasma-x1
 
 dbus-launch fcitx &
 sudo /usr/bin/supervisord -c /etc/supervisor/xrdp.conf
+
+sudo chsh -s /usr/bin/zsh $USER
+export SHELL=/usr/bin/zsh

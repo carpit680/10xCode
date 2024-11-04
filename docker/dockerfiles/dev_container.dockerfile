@@ -4,7 +4,7 @@ ARG GID=9001
 ARG UNAME=ubuntu
 ARG HOSTNAME=docker
 ARG NEW_HOSTNAME=${HOSTNAME}-Docker
-ARG USERNAME=$UNAME
+ARG USERNAME="$UNAME"
 ARG HOME=/home/$USERNAME
 ARG LOCALE="US"
 
@@ -141,104 +141,18 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recomm
         zsh && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
-        kde-plasma-desktop \
-        kwin-addons \
-        kwin-x11 \
-        kdeadmin \
-        akregator \
-        ark \
-        baloo-kf5 \
-        breeze-cursor-theme \
-        breeze-icon-theme \
-        debconf-kde-helper \
-        colord-kde \
-        desktop-file-utils \
-        filelight \
-        gwenview \
-        hspell \
-        kaddressbook \
-        kaffeine \
-        kate \
-        kcalc \
-        kcharselect \
-        kdeconnect \
-        kde-spectacle \
-        kde-config-screenlocker \
-        kde-config-updates \
-        kdf \
-        kget \
-        kgpg \
-        khelpcenter \
-        khotkeys \
-        kimageformat-plugins \
-        kinfocenter \
-        kio-extras \
-        kleopatra \
-        kmail \
-        kmenuedit \
-        kmix \
-        knotes \
-        kontact \
-        kopete \
-        korganizer \
-        krdc \
-        ktimer \
-        kwalletmanager \
-        librsvg2-common \
-        okular \
-        okular-extra-backends \
-        plasma-dataengines-addons \
-        plasma-discover \
-        plasma-runners-addons \
-        plasma-wallpapers-addons \
-        plasma-widgets-addons \
-        plasma-workspace-wallpapers \
-        qtvirtualkeyboard-plugin \
-        sonnet-plugins \
-        sweeper \
-        systemsettings \
-        xdg-desktop-portal-kde \
-        kubuntu-restricted-extras \
-        kubuntu-wallpapers \
-        pavucontrol-qt \
-        transmission-qt && \
-    rm -rf /var/lib/apt/lists/*
-
 RUN apt update \
     && DEBIAN_FRONTEND=noninteractive apt install -y \
-        xrdp \
+        # xrdp \
         supervisor \
         htop
 
-RUN apt update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y \
-      ubuntu-wallpapers \
-    && apt clean \
-    && rm -rf /var/cache/apt/archives/* \
-    && rm -rf /var/lib/apt/lists/* 
-
 USER root
 
-ENV XDG_CURRENT_DESKTOP KDE
+# ENV XDG_CURRENT_DESKTOP KDE
 ENV KWIN_COMPOSE N
 # Use sudoedit to change protected files instead of using sudo on kate
 ENV SUDO_EDITOR kate
-
-RUN add-apt-repository ppa:mozillateam/ppa
-
-RUN { \
-      echo 'Package: firefox*'; \
-      echo 'Pin: release o=LP-PPA-mozillateam'; \
-      echo 'Pin-Priority: 1001'; \
-      echo ' '; \
-      echo 'Package: firefox*'; \
-      echo 'Pin: release o=Ubuntu*'; \
-      echo 'Pin-Priority: -1'; \
-    } > /etc/apt/preferences.d/99mozilla-firefox
-
-RUN apt -y update \
- && apt install -y firefox
 
 # install ROS2 Humble
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
@@ -259,18 +173,7 @@ RUN apt update && apt install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Pulseaudio
-RUN apt update && apt install -y libtool libpulse-dev git autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
-
-RUN git clone --recursive https://github.com/pulseaudio/pulseaudio.git && \
-    cd pulseaudio && \
-    git checkout tags/v15.99.1 -b v15.99.1 && \
-    meson build && \
-    ninja -C build && \
-    cd ../ && \
-    git clone --recursive https://github.com/neutrinolabs/pulseaudio-module-xrdp.git && \
-    cd pulseaudio-module-xrdp/ && \
-    ./bootstrap && ./configure PULSE_DIR=$(pwd)/../pulseaudio && \
-    make && make install
+RUN apt update && apt install -y libtool autoconf pkg-config libssl-dev libpam0g-dev libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex bison libxml2-dev dpkg-dev libcap-dev meson ninja-build libsndfile1-dev libtdb-dev check doxygen libxml-parser-perl
 
 USER $USERNAME
 
@@ -299,49 +202,10 @@ RUN sudo apt install ros-humble-slam-toolbox -y
 
 RUN sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-RUN sudo apt update
-RUN sudo apt install -y gz-harmonic
-
-RUN sudo apt install ros-humble-ros-gz-image -y
-RUN sudo apt install ros-humble-ros-gz-sim -y
-RUN sudo apt install ros-humble-ros-ign-bridge -y
+RUN sudo apt-get update
+RUN sudo apt-get install -y gz-harmonic
 
 USER root
-
-# Expose RDP port
-EXPOSE 3389
-
-RUN echo "startplasma-x11" > /etc/skel/.xsession \
-    && install -o root -g xrdp -m 2775 -d /var/run/xrdp \
-    && install -o root -g xrdp -m 3777 -d /var/run/xrdp/sockdir \
-    && install -o root -g root -m 0755 -d /var/run/dbus
-
-# Set supervisord conf for xrdp service
-RUN { \
-      echo "[supervisord]"; \
-      echo "user=root"; \
-      echo "nodaemon=true"; \
-      echo "logfile=/var/log/supervisor/supervisord.log"; \
-      echo "childlogdir=/var/log/supervisor"; \
-      echo "[program:dbus]"; \
-      echo "command=/usr/bin/dbus-daemon --system --nofork --nopidfile"; \
-      echo "[program:xrdp-sesman]"; \
-      echo "command=/usr/sbin/xrdp-sesman --nodaemon"; \
-      echo "[program:xrdp]"; \
-      echo "command=/usr/sbin/xrdp --nodaemon"; \
-      echo "user=xrdp"; \
-      echo "[program:pulseaudio]"; \
-      echo "priority=15"; \
-      echo "directory=/home/$USERNAME"; \
-      echo "command=/usr/bin/pulseaudio"; \
-      echo "user=$USERNAME"; \
-      echo "autostart=true"; \
-      echo "autorestart=true"; \
-      echo "stopsignal=TERM"; \
-      echo "environment=DISPLAY=:1,HOME=/home/$USERNAME"; \
-      echo "stdout_logfile=/var/log/pulseaudio.log"; \
-      echo "stderr_logfile=/var/log/pulseaudio.err"; \
-    } > /etc/supervisor/xrdp.conf
 
 RUN { \
       echo '#DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };'; \
@@ -351,35 +215,12 @@ RUN { \
 
 USER ${USER}
 RUN LANG=C xdg-user-dirs-update --force
-RUN touch /home/${USERNAME}/Desktop/home.desktop
-RUN touch /home/${USERNAME}/Desktop/trash.desktop
-
-# Make Desktop Icons
-RUN { \
-    echo "[Desktop Entry]"; \
-    echo "Encoding=UTF-8"; \
-    echo "Name=Home"; \
-    echo "GenericName=Personal Files"; \
-    echo "URL[$e]=$HOME"; \
-    echo "Icon=user-home"; \
-    echo "Type=Link"; \
-    } > /home/${USERNAME}/Desktop/home.desktop
-
-RUN { \
-    echo "[Desktop Entry]"; \
-    echo "Name=Trash"; \
-    echo "Comment=Contains removed files"; \
-    echo "Icon=user-trash-full"; \
-    echo "EmptyIcon=user-trash"; \
-    echo "URL=trash:/"; \
-    echo "Type=Link"; \
-    } > /home/${USERNAME}/Desktop/trash.desktop
 
 USER root
 RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/*
 RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
 
 # Copy entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
+COPY dev-container-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/dev-container-entrypoint.sh
+ENTRYPOINT ["dev-container-entrypoint.sh"]

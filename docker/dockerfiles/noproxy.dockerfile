@@ -241,6 +241,8 @@ RUN { \
 RUN apt -y update \
  && apt install -y firefox
 
+USER $USERNAME
+
 # install ROS2 Humble
 RUN sudo apt update && sudo apt install locales
 RUN sudo locale-gen en_US en_US.UTF-8
@@ -255,12 +257,12 @@ RUN sudo apt install ros-humble-desktop -y
 RUN sudo apt install ros-dev-tools -y 
 
 # Install ROS tools
-RUN apt update && apt install -y --no-install-recommends \
+RUN sudo apt update && sudo apt install -y --no-install-recommends \
         python3-colcon-common-extensions \
         python3-rosdep \
         && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
+    sudo apt clean && \
+    sudo rm -rf /var/lib/apt/lists/*
 
 # initialize rosdep
 RUN sudo rosdep init && \
@@ -286,12 +288,12 @@ RUN sudo apt install ros-humble-slam-toolbox -y
 
 RUN sudo apt update && sudo apt install ros-humble-ros-gz -y 
 
-RUN apt-get update \
-  && apt-get upgrade -y \
-  && apt-get update && apt-get install -q -y --no-install-recommends \
+RUN sudo apt-get update \
+  && sudo apt-get upgrade -y \
+  && sudo apt-get update && sudo apt-get install -q -y --no-install-recommends \
     dirmngr \
     cmake \
-  && apt-get clean
+  && sudo apt-get clean
 
 RUN mkdir -p /home/$USERNAME/ros2_ws/src \
     && cd /home/$USERNAME/ros2_ws/src \

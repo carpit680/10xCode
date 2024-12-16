@@ -15,7 +15,7 @@ NAME_IMAGE="${NAME_PREFIX}${LATEST_COMMIT_ID}"
 
 if [ "$(docker ps -al | grep "${NAME_PREFIX}")" ]; then
 	echo "docker container restarting..."
-	CONTAINER_ID=$(docker ps -a -f name="${NAME_PREFIX}" --format "{{.ID}}")
+	CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}" --format "{{.ID}}")
 	
 	sudo rm -rf /tmp/.docker.xauth
 	XAUTH=/tmp/.docker.xauth

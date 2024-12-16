@@ -44,7 +44,7 @@ fi
 if [ ! $# -ne 1 ]; then
 	if [ "commit" = $1 ]; then
 		docker commit "${NAME_IMAGE}" "${NAME_IMAGE}":latest
-		CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}"-docker --format "{{.ID}}")
+		CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}" --format "{{.ID}}")
 		docker rm $CONTAINER_ID -f
 		exit 0
 	fi
@@ -53,7 +53,7 @@ fi
 # Stop
 if [ ! $# -ne 1 ]; then
 	if [ "stop" = $1 ]; then
-		CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}"-docker --format "{{.ID}}")
+		CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}" --format "{{.ID}}")
 		docker stop $CONTAINER_ID
 		docker rm $CONTAINER_ID -f
 		exit 0
@@ -64,7 +64,7 @@ fi
 if [ ! $# -ne 1 ]; then
 	if [ "delete" = $1 ]; then
 		echo 'Now deleting docker container...'
-		CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}"-docker --format "{{.ID}}")
+		CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}" --format "{{.ID}}")
 		docker stop $CONTAINER_ID
 		docker rm $CONTAINER_ID -f
 		docker image rm "${NAME_IMAGE}"
@@ -81,7 +81,7 @@ fi
 chmod a+r $XAUTH
 
 DOCKER_OPT=""
-DOCKER_NAME=""${NAME_IMAGE}"-docker"
+DOCKER_NAME="${NAME_IMAGE}"
 DOCKER_WORK_DIR="/home/${USER}"
 MAC_WORK_DIR="/Users/${USER}"
 DISPLAY=$(hostname):0
@@ -106,7 +106,7 @@ DOCKER_OPT="${DOCKER_OPT} \
 		
 ## Allow X11 Connection
 xhost +local:`hostname`
-CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}"-docker --format "{{.ID}}")
+CONTAINER_ID=$(docker ps -a -f name="${NAME_IMAGE}" --format "{{.ID}}")
 if [ ! "$CONTAINER_ID" ]; then
 	if [ ! $# -ne 1 ]; then
 		if [ "xrdp" = $1 ]; then
